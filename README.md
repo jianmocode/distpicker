@@ -184,6 +184,14 @@ Defines the initial value of city `<select>`. If it is a valid city under the se
 
 Defines the initial value of district `<select>`. If it is a valid district under the selected city, it will be selected. If not, it will be used as a placeholder.
 
+### url
+
+- Type: `String`
+- Default: ``
+
+Get districts from this url.
+
+
 [⬆ back to top](#table-of-contents)
 
 ## Methods
