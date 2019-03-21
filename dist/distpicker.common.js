@@ -5,7 +5,7 @@
  * Copyright 2014-present Chen Fengyuan
  * Released under the MIT license
  *
- * Date: 2018-12-01T09:59:25.126Z
+ * Date: 2019-03-21T04:05:04.479Z
  */
 
 'use strict';
@@ -4165,6 +4165,7 @@ var WINDOW = typeof window !== 'undefined' ? window : {};
 var NAMESPACE = 'distpicker';
 var EVENT_CHANGE = 'change';
 
+var CUSTOM_DISTRICTS = null;
 var DEFAULT_CODE = 100000;
 var PROVINCE = 'province';
 var CITY = 'city';
@@ -4174,19 +4175,40 @@ var Distpicker =
 /*#__PURE__*/
 function () {
   function Distpicker(element, options) {
+    var _this = this;
+
     _classCallCheck(this, Distpicker);
 
     this.$element = $(element);
     this.options = $.extend({}, DEFAULTS, $.isPlainObject(options) && options);
     this.placeholders = $.extend({}, DEFAULTS);
-    this.ready = false;
-    this.init();
+    this.ready = false; // 读取自定义地区源
+
+    if (options.url) {
+      $.ajax({
+        type: "GET",
+        url: options.url,
+        contentType: "application/json",
+        dataType: "json",
+        cache: true,
+        success: function success(data) {
+          CUSTOM_DISTRICTS = data;
+
+          _this.init();
+        },
+        error: function error(xhr, textStatus, errorThrown) {
+          this.init();
+        }
+      });
+    } else {
+      this.init();
+    }
   }
 
   _createClass(Distpicker, [{
     key: "init",
     value: function init() {
-      var _this = this;
+      var _this2 = this;
 
       var options = this.options;
       var $selects = this.$element.find('select');
@@ -4198,9 +4220,9 @@ function () {
       $.each([PROVINCE, CITY, DISTRICT], function (i, type) {
         if (data[type]) {
           options[type] = data[type];
-          _this["$".concat(type)] = $selects.filter("[data-".concat(type, "]"));
+          _this2["$".concat(type)] = $selects.filter("[data-".concat(type, "]"));
         } else {
-          _this["$".concat(type)] = length > i ? $selects.eq(i) : null;
+          _this2["$".concat(type)] = length > i ? $selects.eq(i) : null;
         }
       });
       this.bind(); // Reset all the selects (after event binding)
@@ -4211,19 +4233,19 @@ function () {
   }, {
     key: "bind",
     value: function bind() {
-      var _this2 = this;
+      var _this3 = this;
 
       if (this.$province) {
         this.$province.on(EVENT_CHANGE, this.onChangeProvince = $.proxy(function () {
-          _this2.output(CITY);
+          _this3.output(CITY);
 
-          _this2.output(DISTRICT, true);
+          _this3.output(DISTRICT, true);
         }, this));
       }
 
       if (this.$city) {
         this.$city.on(EVENT_CHANGE, this.onChangeCity = $.proxy(function () {
-          return _this2.output(DISTRICT, true);
+          return _this3.output(DISTRICT, true);
         }, this));
       }
     }
@@ -4342,7 +4364,7 @@ function () {
     key: "getDistricts",
     value: function getDistricts() {
       var code = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : DEFAULT_CODE;
-      return DISTRICTS[code] || null;
+      return (CUSTOM_DISTRICTS ? CUSTOM_DISTRICTS[code] : DISTRICTS[code]) || null;
     }
   }, {
     key: "reset",
@@ -4423,3 +4445,4 @@ if (WINDOW.document) {
     $("[data-toggle=\"".concat(NAMESPACE, "\"]")).distpicker();
   });
 }
+//# sourceMappingURL=distpicker.common.js.map

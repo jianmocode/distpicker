@@ -3,6 +3,7 @@ import DEFAULTS from './defaults';
 import DISTRICTS from './districts';
 import { EVENT_CHANGE } from './constants';
 
+let CUSTOM_DISTRICTS = null;
 const DEFAULT_CODE = 100000;
 const PROVINCE = 'province';
 const CITY = 'city';
@@ -14,7 +15,26 @@ export default class Distpicker {
     this.options = $.extend({}, DEFAULTS, $.isPlainObject(options) && options);
     this.placeholders = $.extend({}, DEFAULTS);
     this.ready = false;
-    this.init();
+
+    // 读取自定义地区源
+    if (options.url) {
+      $.ajax({
+        type: 'GET',
+        url: options.url,
+        contentType: 'application/json',
+        dataType: 'json',
+        cache: true,
+        success: (data) => {
+          CUSTOM_DISTRICTS = data;
+          this.init();
+        },
+        error() {
+          this.init();
+        },
+      });
+    } else {
+      this.init();
+    }
   }
 
   init() {
@@ -172,7 +192,7 @@ export default class Distpicker {
 
   // eslint-disable-next-line class-methods-use-this
   getDistricts(code = DEFAULT_CODE) {
-    return DISTRICTS[code] || null;
+    return (CUSTOM_DISTRICTS ? CUSTOM_DISTRICTS[code] : DISTRICTS[code]) || null;
   }
 
   reset(deep) {
