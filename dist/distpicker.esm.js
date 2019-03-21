@@ -4182,17 +4182,17 @@ function () {
 
     if (options.url) {
       $.ajax({
-        type: "GET",
+        type: 'GET',
         url: options.url,
-        contentType: "application/json",
-        dataType: "json",
+        contentType: 'application/json',
+        dataType: 'json',
         cache: true,
         success: function success(data) {
           CUSTOM_DISTRICTS = data;
 
           _this.init();
         },
-        error: function error(xhr, textStatus, errorThrown) {
+        error: function error() {
           this.init();
         }
       });
